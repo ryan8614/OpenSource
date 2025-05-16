@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# Check the number of the arguments
+# If the number is not exactly 2, print error message
+if [[ "$#" -ne 2 ]]
+then
+    echo "Error: The number of arguments does not match, you provided $# but 2 are required!" >&2
+    echo "Usage: ./empty_cells <file_name> <separator_character>" >&2
+    exit 1
+fi
+
+file="$1"
+sep="$2"
+
+# Check file existence and permissions
+if [[ ! -f "$file"  ]]; then
+    echo "Error: File '$file' is not found." >&2
+    exit 1
+fi
+if [[ ! -r "$file" ]]; then
+    echo "Error: File '$file' is not readable." >&2
+    exit 1
+fi
+
+# Check the file format (txt)
+if [[ "$file" != *.txt ]]; then
+    echo "Error: File '$file' is not a txt file." >&2
+    exit 1
+fi
+
+# Check the separator is not empty
+if [[ -z "$sep" ]]; then
+  echo "Error: Separator cannot be empty." >&2
+  exit 1
+fi
+
+# Create a cleaned copy of the file (remove \r) using tr
+cleaned_file=$(mktemp)
+tr -d '\r' < "$file" > "$cleaned_file"
+
+# Use gawk to split the fields and count the number of empty cells
+gawk -v FS="$sep" '
+NR==1 {
+    for (i=1; i<=NF; i++) {
+        header[i] = $i
+        empty[i] = 0
+    }
+    nf=NF
+    next
+}
+{
+    for (i=1; i<=NF; i++) {
+        if ($i ~ /^[ ]*$/) {
+            empty[i]++
+        }
+    }
+}
+END {
+    for (i=1; i<=nf; i++) {
+        print header[i] ": " empty[i]
+    }
+}
+' "$cleaned_file"
+
+# Remove the cleaned temporary file
+rm -f "$cleaned_file"
