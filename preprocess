@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# Check the number of the arguments
+# If the number is 1, then use the default separator ';'
+# Else if the number is 2, then use the privided separator '$2'
+# Else print error message
+if [[ $# == 1 ]]
+then
+    file="$1"
+    sep=";"
+elif [[ $# == 2 ]]
+then
+    file="$1"
+    sep="$2"
+else
+    echo "Error: The number of arguments does not match" >&2
+    exit 1
+fi
+
+# Check file existence and permissions
+if [[ ! -f "$file"  ]]; then
+    echo "Error: File '$file' is not found." >&2
+    exit 1
+fi
+if [[ ! -r "$file" ]]; then
+    echo "Error: File '$file' is not readable." >&2
+    exit 1
+fi
+
+# Create a temp file to store the cleaned file
+cleaned_file=$(mktemp)
+
+# Data cleaning
+# 1. Convert the semicolon separator to the  <tab> character (replace separator with '\t')
+# 2. Convert the Microsoft line endings to Unix line endings (remove '\r')
+# 3. Change format of floating-point numbers to use '.' rather than ',' as the decimal point.
+# 4. Deal with non-ASCII characters by deleting them from the output.
+sed -e "s/$sep/$(printf '\t')/g" < "$file" \
+| tr -d '\r' \
+| sed 's/,/./g' \
+| tr -cd '\11\12\15\40-\176\n' > "$cleaned_file"
+
+# Find the max ID number
+max_id=$(
+    gawk -F '\t' '
+    BEGIN {
+        maxid=0
+    }
+    NR > 1 && $1 ~ /^[0-9]+$/ && int($1) > maxid {
+        maxid=int($1)        
+    }
+    END {
+        print maxid
+    }
+    ' "$cleaned_file"
+)
+
+# Filling the missing ID
+# Assume that ID is the first column
+gawk -F '\t' -v OFS='\t' -v maxid="$maxid" '
+{
+    if ($1 ~ /^[ ]*$/) {
+        $1 = ++maxid
+    }
+    print $0
+}
+' "$cleaned_file"
+
+# Remove the cleaned temporary file
+rm -f "$cleaned_file"
