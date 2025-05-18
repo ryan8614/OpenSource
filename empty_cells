@@ -40,23 +40,23 @@ tr -d '\r' < "$file" > "$cleaned_file"
 
 # Use gawk to split the fields and count the number of empty cells
 gawk -v FS="$sep" '
-NR==1 {
-    for (i=1; i<=NF; i++) {
+NR == 1 {
+    for (i = 1; i <= NF; i++) {
         header[i] = $i
         empty[i] = 0
     }
-    nf=NF
+    nf = NF
     next
 }
 {
-    for (i=1; i<=NF; i++) {
+    for (i = 1; i <= NF; i++) {
         if ($i ~ /^[ ]*$/) {
             empty[i]++
         }
     }
 }
 END {
-    for (i=1; i<=nf; i++) {
+    for (i = 1; i <= nf; i++) {
         print header[i] ": " empty[i]
     }
 }

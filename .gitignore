@@ -2,3 +2,6 @@
 *.txt
 *.tsv
 *.xlsm
+
+# Ignore macOS system file
+.DS_Store

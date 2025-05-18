@@ -18,7 +18,7 @@ else
 fi
 
 # Check file existence and permissions
-if [[ ! -f "$file"  ]]; then
+if [[ ! -f "$file" ]]; then
     echo "Error: File '$file' is not found." >&2
     exit 1
 fi
@@ -44,10 +44,10 @@ sed -e "s/$sep/$(printf '\t')/g" < "$file" \
 max_id=$(
     gawk -F '\t' '
     BEGIN {
-        maxid=0
+        maxid = 0
     }
     NR > 1 && $1 ~ /^[0-9]+$/ && int($1) > maxid {
-        maxid=int($1)        
+        maxid = int($1)        
     }
     END {
         print maxid
