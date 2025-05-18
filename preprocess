@@ -41,19 +41,23 @@ sed -e "s/$sep/$(printf '\t')/g" < "$file" \
 | tr -cd '\11\12\15\40-\176\n' > "$cleaned_file"
 
 # Find the max ID number
-max_id=$(
+maxid=$(
     gawk -F '\t' '
-    BEGIN {
-        maxid = 0
-    }
-    NR > 1 && $1 ~ /^[0-9]+$/ && int($1) > maxid {
-        maxid = int($1)        
+    NR > 1 && $1 ~ /^[0-9]+$/ && int($1) {
+        id = int($1)
+        if (id > maxid) maxid = id
     }
     END {
         print maxid
     }
     ' "$cleaned_file"
 )
+
+# Check if the max ID is greater than 0
+if [[ $maxid -le 0 ]]; then
+    echo "Error: The max ID number is not greater than 0." >&2
+    exit 1
+fi
 
 # Filling the missing ID
 # Assume that ID is the first column
