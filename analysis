@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+# ------------------------------------------------------------------------------
+# Author: <Ryan Chang>
+# Script Name: analysis
+# Description: Analyze a board game dataset (TSV format) to extract statistical insights.
+#              This script performs the following:
+#              - Finds the most popular game mechanic (column 13) and domain (column 14)
+#              - Calculates average values for publication year, rating, and complexity
+#              - Computes Pearson correlation coefficients between:
+#                  • Year of publication and average rating
+#                  • Game complexity and average rating
+#              It handles data cleaning, multiple comma-separated values, and reports
+#              errors for missing or insufficient data.
+# Usage: ./analysis <file>
+# ------------------------------------------------------------------------------
+
 # Check the number of arguments
 # If the number is not 1, print error message
 if [[ $# != 1 ]]

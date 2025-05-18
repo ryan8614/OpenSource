@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# ------------------------------------------------------------------------------
+# Author: <Ryan Chang>
+# Script Name: empty_cells
+# Description: Check for and report the number of empty fields (cells) in each row of a delimited file.
+#              The script supports custom field separators and handles edge cases like unreadable files.
+# Usage: ./empty_cells <file> [separator]
+# -----------------------------------------------------------------------------
+
 # Check the number of the arguments
 # If the number is not exactly 2, print error message
 if [[ "$#" -ne 2 ]]

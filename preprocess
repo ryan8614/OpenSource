@@ -1,21 +1,25 @@
 #!/usr/bin/env bash
 
-# Check the number of the arguments
-# If the number is 1, then use the default separator ';'
-# Else if the number is 2, then use the privided separator '$2'
-# Else print error message
-if [[ $# == 1 ]]
+# ------------------------------------------------------------------------------
+# Author: <Ryan Chang>
+# Script Name: preprocess
+# Description: Preprocess a raw CSV file by cleaning up formatting issues.
+#              This includes convert the semicolon separator to the  <tab> character, Convert
+#              the Microsoft line endings to Unix line endings, Change format of floating-point numbers. 
+#              The cleaned output is printed to stdout.
+# Usage: ./preprocess <file>
+# ------------------------------------------------------------------------------
+
+# Check the number of arguments
+# If the number is not 1, print error message
+if [[ $# != 1 ]]
 then
-    file="$1"
-    sep=";"
-elif [[ $# == 2 ]]
-then
-    file="$1"
-    sep="$2"
-else
     echo "Error: The number of arguments does not match" >&2
     exit 1
 fi
+
+file="$1"
+sep=";"
 
 # Check file existence and permissions
 if [[ ! -f "$file" ]]; then
