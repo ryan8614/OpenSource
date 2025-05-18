@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# Check the number of arguments
+# If the number is not 1, print error message
+if [[ $# != 1 ]]
+then
+    echo "Error: The number of arguments does not match" >&2
+    exit 1
+fi
+
+file="$1"
+
+# Check file existence and permissions
+if [[ ! -f "$file"  ]]; then
+    echo "Error: File '$file' is not found." >&2
+    exit 1
+fi
+if [[ ! -r "$file" ]]; then
+    echo "Error: File '$file' is not readable." >&2
+    exit 1
+fi
+
+# Find the most popular mechanic
+# 1. Extract Mechanics field (column 13) and skip empty entries and header
+# 2. Spread multiple mechanics (comma-separated) into individual lines
+# 3. Remove leading and trailing spaces or tabs from each mechanic
+# 4. Remove blank lines caused by empty or malformed entries
+# 5. Replace internal spaces with underscores for reliable field separation
+# 6. Sort all mechanics alphabetically
+# 7. Count each unique mechanic
+# 8. Sort mechanics by frequency in descending order
+# 9. Select the most frequent mechanic
+# 10. Print formatted output with mechanic name and count, restoring spaces
+awk -F '\t' 'NR > 1 && $13 != "" { print $13 }' "$file"\
+| sed 's/,/\n/g' \
+| sed 's/^[ \t]*//;s/[ \t]*$//' \
+| grep -v '^$' \
+| sed 's/ /_/g' \
+| sort \
+| uniq -c \
+| sort -nr \
+| head -n 1 \
+| awk '{print "The most popular game mechanics is " $2 " found in " $1 " games"}' \
+| sed 's/_/ /g'
+
+# Find the most popular domain
+# 1. Extract Domains field (column 14) and skip empty entries and header
+# 2. Spread multiple values (comma-separated) into individual lines
+# 3. Remove leading and trailing spaces or tabs from each domain
+# 4. Remove blank lines caused by empty or malformed entries
+# 5. Replace internal spaces with underscores for reliable field parsing
+# 6. Sort all domains alphabetically
+# 7. Count each unique domain
+# 8. Sort domains by frequency in descending order
+# 9. Select the most frequent domain
+# 10. Print formatted output with domain name and count, restoring spaces
+awk -F '\t' 'NR > 1 && $14 != "" { print $14 }' "$file" \
+| sed 's/,/\n/g' \
+| sed 's/^[ \t]*//;s/[ \t]*$//' \
+| grep -v '^$' \
+| sed 's/ /_/g' \
+| sort \
+| uniq -c \
+| sort -nr \
+| head -n 1 \
+| awk '{print "The most game domain is " $2 " found in " $1 " games"}' \
+| sed 's/_/ /g'
