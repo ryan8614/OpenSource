@@ -37,17 +37,31 @@ cleaned_file=$(mktemp)
 # Data cleaning
 # 1. Convert the semicolon separator to the  <tab> character (replace separator with '\t')
 # 2. Convert the Microsoft line endings to Unix line endings (remove '\r')
-# 3. Change format of floating-point numbers to use '.' rather than ',' as the decimal point.
-# 4. Deal with non-ASCII characters by deleting them from the output.
+# 3. Deal with non-ASCII characters by deleting them from the output.
+# 4. Change format of floating-point numbers to use '.' rather than ',' as the decimal point.
 sed -e "s/$sep/$(printf '\t')/g" < "$file" \
 | tr -d '\r' \
-| sed 's/,/./g' \
-| tr -cd '\11\12\15\40-\176\n' > "$cleaned_file"
+| tr -cd '\11\12\15\40-\176\n' \
+| gawk -F '\t' -v OFS='\t' '
+    NR == 1 { print; next }
+    {
+        for (i = 1; i <= NF; i++) {
+            val = $i
+            if (i == 9 || i == 11) {
+                $i = ""
+                for (j = 1; j <= length(val); j++) {
+                    c = substr(val, j, 1)
+                    $i = $i ((c == ",") ? "." : c)
+                }
+            }
+        }
+        print 
+    }' > "$cleaned_file"
 
 # Find the max ID number
 maxid=$(
     gawk -F '\t' '
-    NR > 1 && $1 ~ /^[0-9]+$/ && int($1) {
+    NR > 1 && $1 ~ /^[0-9]+$/ {
         id = int($1)
         if (id > maxid) maxid = id
     }
@@ -66,13 +80,17 @@ fi
 # Filling the missing ID
 # Assume that ID is the first column
 gawk -F '\t' -v OFS='\t' -v maxid="$maxid" '
+NR == 1 { print; next }
 {
-    if ($1 ~ /^[ ]*$/) {
+    if ($1 ~ /^[ \t]*$/) {
         $1 = ++maxid
     }
-    print $0
+    print
 }
 ' "$cleaned_file"
 
 # Remove the cleaned temporary file
 rm -f "$cleaned_file"
+
+# Exit successfully
+exit 0

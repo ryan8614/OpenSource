@@ -58,7 +58,7 @@ NR == 1 {
 }
 {
     for (i = 1; i <= NF; i++) {
-        if ($i ~ /^[ ]*$/) {
+        if ($i ~ /^[ \t]*$/) {
             empty[i]++
         }
     }
@@ -72,3 +72,6 @@ END {
 
 # Remove the cleaned temporary file
 rm -f "$cleaned_file"
+
+# Exit successfully
+exit 0
