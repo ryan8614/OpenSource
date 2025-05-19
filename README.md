@@ -14,7 +14,7 @@ This repository contains three Bash scripts designed to preprocess, clean, and a
 *Usage:*
 
 ```bash
-./empty_cells <input_file>
+./empty_cells <input_file> [separator]
 ```
 
 ------
@@ -33,7 +33,7 @@ This repository contains three Bash scripts designed to preprocess, clean, and a
 *Usage:*
 
 ```bash
-./preprocess <input_file> [separator]
+./preprocess <input_file>
 ```
 
 - If no separator is provided, defaults to ;.
