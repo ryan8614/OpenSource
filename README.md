@@ -5,7 +5,23 @@ This repository contains three Bash scripts designed to preprocess, clean, and a
 
 #### **Scripts Overview**
 
-##### 1. preprocess
+##### 1. empty_cells
+
+- *Purpose: Detects and reports rows in a file that contain empty fields.*
+- *Input: A tab-separated value file (typically the output from preprocess)*
+- *Output: Prints line numbers and content with empty fields to stderr and exits with status code 1 if any are found.*
+
+*Usage:*
+
+```bash
+./empty_cells <input_file>
+```
+
+------
+
+
+
+##### 2. preprocess
 
 - *Purpose: Cleans and reformats a raw dataset by:*
   - *Converting separators (e.g., ; to tabs)*
@@ -21,22 +37,6 @@ This repository contains three Bash scripts designed to preprocess, clean, and a
 ```
 
 - If no separator is provided, defaults to ;.
-
-------
-
-
-
-##### 2. empty_cells
-
-- *Purpose: Detects and reports rows in a file that contain empty fields.*
-- *Input: A tab-separated value file (typically the output from preprocess)*
-- *Output: Prints line numbers and content with empty fields to stderr and exits with status code 1 if any are found.*
-
-*Usage:*
-
-```bash
-./empty_cells <input_file>
-```
 
 ------
 
